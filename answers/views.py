@@ -5,7 +5,7 @@ from formpages.models import Page
 
 
 def page_dev(request):
-    return render(request, "answers/base_page.html")
+    return render(request, "answers/page.html")
 
 
 def page(request, page_id):
