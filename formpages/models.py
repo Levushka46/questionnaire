@@ -10,14 +10,22 @@ class Page(models.Model):
 class Question(models.Model):
 
     class Types(models.TextChoices):
-        TEXT = 'line', _('single line text')
-        SELECT = 'select', _('select')
+        TEXT = "line", _("single line text")
+        SELECT = "select", _("select")
 
     text = models.CharField(_("question text"), max_length=255)
-    type = models.CharField(_("question type"), max_length=32, choices=Types.choices, default=Types.TEXT)
+    type = models.CharField(
+        _("question type"), max_length=32, choices=Types.choices, default=Types.TEXT
+    )
 
-    page = models.ForeignKey(Page, on_delete=models.SET_NULL, null=True, blank=True, related_name='questions',
-                             verbose_name=_("page"))
+    page = models.ForeignKey(
+        Page,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="questions",
+        verbose_name=_("page"),
+    )
     order = models.PositiveSmallIntegerField(_("order on the page"), default=1)
 
     required = models.BooleanField(_("required"), default=False)
@@ -25,7 +33,11 @@ class Question(models.Model):
 
 
 class SelectOption(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options',
-                                 verbose_name=_("question"))
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        related_name="options",
+        verbose_name=_("question"),
+    )
     text = models.CharField(_("option text"), max_length=255)
     order = models.PositiveSmallIntegerField(_("option order"), default=1)

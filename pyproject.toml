@@ -8,6 +8,10 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 django = "~5.0"
+black = "~24.4"
+
+[tool.black]
+line-length = 88
 
 
 [build-system]
