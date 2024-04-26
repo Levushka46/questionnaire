@@ -1,11 +1,24 @@
 from django.shortcuts import render, get_object_or_404
+from django import forms
 
-from formpages.forms import PageForm
+from answers.forms import PageForm
+from answers.widgets import RadioSelect, CheckboxSelectMultiple
 from formpages.models import Page
 
 
 def page_dev(request):
-    return render(request, "answers/page.html")
+    class TestForm(PageForm):
+        question_1 = forms.CharField(label="Question 1?")
+        question_radio = forms.ChoiceField(
+            choices=[(1, "Option 1"), (2, "Option 2")],
+            widget=RadioSelect,
+        )
+        question_checkboxes = forms.MultipleChoiceField(
+            choices=[(1, "Option 1"), (2, "Option 2")],
+            widget=CheckboxSelectMultiple,
+        )
+    form = TestForm(request.POST or None)
+    return render(request, "answers/page.html", {"form": form})
 
 
 def page(request, page_id):

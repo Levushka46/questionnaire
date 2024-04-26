@@ -3,10 +3,17 @@ from django.forms import CharField, RadioSelect, CheckboxSelectMultiple
 
 
 class PageForm(Form):
-    def __init__(self, page, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    template_name = "answers/form_snippet.html"
 
-        for question in page.questions.all():
+    def __init__(self, page=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.page = page
+        if page is not None:
+            self._init_fields()
+        self._init_css_classes()
+
+    def _init_fields(self):
+        for question in self.page.questions.all():
             if question.type == "line":
                 self.fields[f"question_{question.id}"] = CharField(
                     label=question.text, required=question.required
@@ -27,3 +34,9 @@ class PageForm(Form):
                 self.fields[f"question_{question.id}"].widget.attrs[
                     "multiple"
                 ] = True
+
+    def _init_css_classes(self):
+        for visible in self.visible_fields():
+            widget = visible.field.widget
+            if not isinstance(widget, (RadioSelect, CheckboxSelectMultiple)):
+                widget.attrs['class'] = 'form-control'
