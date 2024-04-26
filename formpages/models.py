@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Page(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
+    title = models.CharField(_("title"), max_length=255)
+    description = models.TextField(_("description"), blank=True)
 
 
 class Question(models.Model):
