@@ -35,3 +35,7 @@ def page(request, page_id):
             pass
 
     return render(request, "answers/page.html", {"page": page, "form": form})
+
+
+def sign_in(request):
+    return render(request, "answers/sign_in.html")
