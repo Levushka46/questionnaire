@@ -1,7 +1,13 @@
-from django.forms import Form
-from django.forms import CharField, ChoiceField, MultipleChoiceField
+from django.db.models import Q
+from django.forms import Form, ValidationError
+from django.forms import CharField, ChoiceField, EmailField, MultipleChoiceField
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 
 from .widgets import RadioSelect, CheckboxSelectMultiple
+
+
+User = get_user_model()
 
 
 class PageForm(Form):
@@ -41,3 +47,30 @@ class PageForm(Form):
             widget = visible.field.widget
             if not isinstance(widget, (RadioSelect, CheckboxSelectMultiple)):
                 widget.attrs['class'] = 'form-control'
+
+
+class SignInForm(UserCreationForm):
+    name = CharField(max_length=255)
+    email = EmailField(max_length=255)
+    password = CharField()
+
+    password1 = None
+    password2 = None
+
+    class Meta:
+        model = get_user_model()
+        fields = ("email",)
+
+    def _post_clean(self):
+        super()._post_clean()
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(Q(email=email) | Q(username=email)).exists():
+            e = ValidationError("User with this email already exists.")
+            self.add_error("email", e)
+
+    def save(self):
+        email = self.cleaned_data["email"]
+        password = self.cleaned_data["password"]
+        return User.objects.create_user(
+            email, email=email, password=password, first_name=self.cleaned_data["name"],
+        )
