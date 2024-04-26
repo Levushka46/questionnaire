@@ -18,7 +18,11 @@ def page_dev(request):
             widget=CheckboxSelectMultiple,
         )
     form = TestForm(request.POST or None)
-    return render(request, "answers/page.html", {"form": form})
+    page = {
+        "title": "Page title",
+        "description": "Page description",
+    }
+    return render(request, "answers/page.html", {"page": page, "form": form})
 
 
 def page(request, page_id):

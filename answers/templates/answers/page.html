@@ -147,12 +147,13 @@
 <main>
   <div class="py-3">
     <img class="d-block mx-auto mb-4" src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
-    <h2>Page title</h2>
-    <p class="lead">Page description</p>
+    <h2>{{ page.title }}</h2>
+    <p class="lead">{{ page.description }}</p>
   </div>
 
   <div>
-    <form>
+    <form method="POST">
+      {% csrf_token %}
       <div class="row g-3">
         {{ form }}
       </div>

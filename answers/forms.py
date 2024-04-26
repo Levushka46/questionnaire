@@ -1,5 +1,7 @@
 from django.forms import Form
-from django.forms import CharField, RadioSelect, CheckboxSelectMultiple
+from django.forms import CharField, ChoiceField, MultipleChoiceField
+
+from .widgets import RadioSelect, CheckboxSelectMultiple
 
 
 class PageForm(Form):
@@ -19,9 +21,11 @@ class PageForm(Form):
                     label=question.text, required=question.required
                 )
             elif question.type == "select":
-                ChoiceFieldClass = RadioSelect
+                ChoiceFieldClass = ChoiceField
+                ChoiceWidgetClass = RadioSelect
                 if question.multiple_choice:
-                    ChoiceFieldClass = CheckboxSelectMultiple
+                    ChoiceFieldClass = MultipleChoiceField
+                    ChoiceWidgetClass = CheckboxSelectMultiple
                 self.fields[f"question_{question.id}"] = ChoiceFieldClass(
                     label=question.text,
                     choices=[
@@ -29,11 +33,8 @@ class PageForm(Form):
                         for option in question.options.all()
                     ],
                     required=question.required,
+                    widget=ChoiceWidgetClass,
                 )
-            if question.multiple_choice:
-                self.fields[f"question_{question.id}"].widget.attrs[
-                    "multiple"
-                ] = True
 
     def _init_css_classes(self):
         for visible in self.visible_fields():
