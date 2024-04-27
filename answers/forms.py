@@ -4,6 +4,7 @@ from django.forms import CharField, ChoiceField, EmailField, MultipleChoiceField
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
+from .models import Answer
 from .widgets import RadioSelect, CheckboxSelectMultiple
 
 
@@ -35,7 +36,7 @@ class PageForm(Form):
                 self.fields[f"question_{question.id}"] = ChoiceFieldClass(
                     label=question.text,
                     choices=[
-                        (option.id, option.text)
+                        (option.text, option.text)
                         for option in question.options.all()
                     ],
                     required=question.required,
@@ -47,6 +48,18 @@ class PageForm(Form):
             widget = visible.field.widget
             if not isinstance(widget, (RadioSelect, CheckboxSelectMultiple)):
                 widget.attrs['class'] = 'form-control'
+
+    def save_answers(self, user):
+        answers = []
+        for name, value in self.cleaned_data.items():
+            if name.startswith("question_"):
+                question_id = int(name.split("_")[1])
+                if isinstance(value, list):
+                    answer = ", ".join(value)
+                else:
+                    answer = value
+                answers.append(Answer(user=user, question_id=question_id, answer=answer))
+        Answer.objects.bulk_create(answers)
 
 
 class SignInForm(UserCreationForm):

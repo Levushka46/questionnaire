@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django import forms
 from django.contrib.auth import login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 
 from answers.forms import PageForm, SignInForm
@@ -41,6 +42,27 @@ def page(request, page_id):
 
 def sign_in(request):
     return render(request, "answers/sign_in.html")
+
+
+class PageView(LoginRequiredMixin, View):
+    def get_page(self, page_id):
+        return get_object_or_404(Page, id=page_id)
+
+    def get_form(self, page, data=None):
+        return PageForm(page, data)
+
+    def get(self, request, page_id):
+        page = self.get_page(page_id)
+        form = self.get_form(page)
+        return render(request, "answers/page.html", {"page": page, "form": form})
+
+    def post(self, request, page_id):
+        page = self.get_page(page_id)
+        form = self.get_form(page, request.POST)
+        if form.is_valid():
+            form.save_answers(request.user)
+            return redirect("page_dev")
+        return render(request, "answers/page.html", {"page": page, "form": form})
 
 
 class SignInView(View):
