@@ -5,6 +5,14 @@ from django.utils.translation import gettext_lazy as _
 class Page(models.Model):
     title = models.CharField(_("title"), max_length=255)
     description = models.TextField(_("description"), blank=True)
+    next_page = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="previous_pages",
+        verbose_name=_("next page"),
+    )
 
 
 class Question(models.Model):

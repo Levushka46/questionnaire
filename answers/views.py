@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
+from django.views.generic import TemplateView
 
 from answers.forms import PageForm, SignInForm
 from answers.widgets import RadioSelect, CheckboxSelectMultiple
@@ -61,8 +62,16 @@ class PageView(LoginRequiredMixin, View):
         form = self.get_form(page, request.POST)
         if form.is_valid():
             form.save_answers(request.user)
-            return redirect("page_dev")
+            next_page = page.next_page
+            if next_page is not None:
+                return redirect("page", page_id=next_page.id)
+            else:
+                return redirect("done")
         return render(request, "answers/page.html", {"page": page, "form": form})
+
+
+class DoneView(TemplateView):
+    template_name = "answers/done.html"
 
 
 class SignInView(View):
