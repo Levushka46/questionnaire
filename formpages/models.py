@@ -14,6 +14,9 @@ class Page(models.Model):
         verbose_name=_("next page"),
     )
 
+    def __str__(self):
+        return self.title
+
 
 class Question(models.Model):
 
@@ -39,6 +42,9 @@ class Question(models.Model):
     required = models.BooleanField(_("required"), default=False)
     multiple_choice = models.BooleanField(_("multiple choice"), default=False)
 
+    def __str__(self):
+        return self.text
+
 
 class SelectOption(models.Model):
     question = models.ForeignKey(
@@ -58,3 +64,6 @@ class SelectOption(models.Model):
         related_name="+",
         verbose_name=_("dynamic next page"),
     )
+
+    def __str__(self):
+        return self.text
