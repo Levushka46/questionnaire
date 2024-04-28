@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Page, Question, SelectOption
+from .models import Page, Question, SelectOption, Survey
 
 
 class QuestionInline(admin.StackedInline):
@@ -35,3 +35,11 @@ class SelectOptionAdmin(admin.ModelAdmin):
     list_filter = ("question",)
     search_fields = ("text",)
     ordering = ("question", "order")
+
+
+@admin.register(Survey)
+class SurveyAdmin(admin.ModelAdmin):
+    list_display = ("title", "description", "first_page", "active")
+    search_fields = ("title", "description")
+    list_filter = ("active",)
+    ordering = ("title", "description")

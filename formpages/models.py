@@ -67,3 +67,20 @@ class SelectOption(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class Survey(models.Model):
+    title = models.CharField(_("title"), max_length=255)
+    description = models.TextField(_("description"), blank=True)
+    first_page = models.ForeignKey(
+        Page,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("first page"),
+    )
+    active = models.BooleanField(_("active"), default=False)
+
+    def __str__(self):
+        return self.title

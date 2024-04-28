@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 
 from answers.forms import LoginForm, PageForm, SignInForm
 from answers.widgets import RadioSelect, CheckboxSelectMultiple
-from formpages.models import Page
+from formpages.models import Page, Survey
 
 
 def page_dev(request):
@@ -74,8 +74,16 @@ class DoneView(TemplateView):
     template_name = "answers/done.html"
 
 
+class NoSurveysView(TemplateView):
+    template_name = "answers/no_surveys.html"
+
+
 class SignInView(View):
-    start_page = "page_dev"
+    def get_start_page(self):
+        survey = Survey.objects.filter(active=True).first()
+        if survey is None:
+            return "no_surveys", {}
+        return "page", {"page_id": survey.first_page_id}
 
     def get(self, request):
         logout(request)
@@ -86,7 +94,8 @@ class SignInView(View):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect(self.start_page)
+            url_name, kwargs = self.get_start_page()
+            return redirect(url_name, **kwargs)
         else:
             # If the email is correct, then try to log in user instead
             # name is optional in this case
@@ -97,7 +106,8 @@ class SignInView(View):
                 user = authenticate(request, username=email, password=password)
                 if user is not None:
                     login(request, user)
-                    return redirect(self.start_page)
+                    url_name, kwargs = self.get_start_page()
+                    return redirect(url_name, **kwargs)
                 else:
                     form.add_error("password", "User exists, tried login: Invalid password.")
         return render(request, "answers/sign_in.html", {"form": form})
