@@ -28,10 +28,11 @@ class PageForm(Form):
             answer = None
             if self.user is not None:
                 answer = self.user.answers.filter(question=question).last()
-                if answer and question.type == "select" and question.multiple_choice:
-                    answer = answer.answer.split(", ")
-                else:
-                    answer = answer.answer
+                if answer:
+                    if question.type == "select" and question.multiple_choice:
+                        answer = answer.answer.split(", ")
+                    else:
+                        answer = answer.answer
 
             if question.type == "line":
                 self.fields[f"question_{question.id}"] = CharField(
