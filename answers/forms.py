@@ -4,7 +4,7 @@ from django.forms import CharField, ChoiceField, EmailField, MultipleChoiceField
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Answer
+from .models import Answer, PageStack
 from .widgets import RadioSelect, CheckboxSelectMultiple
 
 
@@ -17,6 +17,7 @@ class PageForm(Form):
     def __init__(self, page=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
+        self.next_page_id = None
         if page is not None:
             self._init_fields()
         self._init_css_classes()
@@ -51,19 +52,63 @@ class PageForm(Form):
 
     def save_answers(self, user):
         answers = []
+        dynamic_next_pages = []
         for name, value in self.cleaned_data.items():
             if name.startswith("question_"):
                 question_id = int(name.split("_")[1])
+                question = self.page.questions.get(id=question_id)
                 if isinstance(value, list):
                     answer = ", ".join(value)
                 else:
                     answer = value
                 answers.append(Answer(user=user, question_id=question_id, answer=answer))
+
+                # Collect all dynamic next pages from the selected options
+                if not isinstance(value, list):
+                    value = [value]
+                value = set(value)
+                if question.type == "select":
+                    options = question.options.all()
+                    for option in options:
+                        dyn_next_page = option.next_page_id
+                        if dyn_next_page is not None and option.text in answer:
+                            dynamic_next_pages.append(dyn_next_page)
+
         Answer.objects.bulk_create(answers)
 
+        # Add page.next_page to the stack
+        if self.page.next_page is not None:
+            dynamic_next_pages.append(self.page.next_page.id)
+
+        # Remove duplicates from the dynamic next pages
+        unique_pages = set()
+        new_stack = []
+        for page in reversed(dynamic_next_pages):
+            if page not in unique_pages:
+                unique_pages.add(page)
+                new_stack.append(page)
+
+        # If there's still a stack, save it
+        page_stack, _ = PageStack.objects.get_or_create(user=user)
+        stack_value = page_stack.value
+        if stack_value:
+            stack = list(map(int, stack_value.split(",")))
+        else:
+            stack = []
+        unique_pages = set(stack)
+        for page_id in new_stack:
+            if page_id not in unique_pages:
+                stack.append(page_id)
+
+        # The first stack entry is the next page
+        if stack:
+            self.next_page_id = stack.pop()
+
+        page_stack.value = ",".join(map(str, stack))
+        page_stack.save()
+
     def get_next_page_id(self):
-        next_page = self.page.next_page
-        return next_page.id if next_page is not None else None
+        return self.next_page_id
 
 
 class SignInForm(UserCreationForm):

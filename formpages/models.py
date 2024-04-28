@@ -49,3 +49,12 @@ class SelectOption(models.Model):
     )
     text = models.CharField(_("option text"), max_length=255)
     order = models.PositiveSmallIntegerField(_("option order"), default=1)
+    next_page = models.ForeignKey(
+        Page,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,
+        related_name="+",
+        verbose_name=_("dynamic next page"),
+    )

@@ -16,3 +16,13 @@ class Answer(models.Model):
         Question, on_delete=models.CASCADE, verbose_name=_("question")
     )
     answer = models.CharField(_("answer"), max_length=255)
+
+
+class PageStack(models.Model):
+    user = models.OneToOneField(
+        UserModel,
+        on_delete=models.CASCADE,
+        related_name="page_stack",
+        verbose_name=_("user"),
+    )
+    value = models.CharField(_("value"), max_length=255)
