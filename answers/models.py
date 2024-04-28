@@ -10,10 +10,10 @@ UserModel = get_user_model()
 
 class Answer(models.Model):
     user = models.ForeignKey(
-        UserModel, on_delete=models.CASCADE, verbose_name=_("user")
+        UserModel, on_delete=models.CASCADE, related_name="answers", verbose_name=_("user")
     )
     question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, verbose_name=_("question")
+        Question, on_delete=models.CASCADE, related_name="answers", verbose_name=_("question")
     )
     answer = models.CharField(_("answer"), max_length=255)
 

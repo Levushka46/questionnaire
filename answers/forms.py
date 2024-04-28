@@ -14,9 +14,10 @@ User = get_user_model()
 class PageForm(Form):
     template_name = "answers/form_snippet.html"
 
-    def __init__(self, page=None, *args, **kwargs):
+    def __init__(self, page=None, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
+        self.user = user
         self.next_page_id = None
         if page is not None:
             self._init_fields()
@@ -24,9 +25,17 @@ class PageForm(Form):
 
     def _init_fields(self):
         for question in self.page.questions.all():
+            answer = None
+            if self.user is not None:
+                answer = self.user.answers.filter(question=question).last()
+                if answer and question.type == "select" and question.multiple_choice:
+                    answer = answer.answer.split(", ")
+                else:
+                    answer = answer.answer
+
             if question.type == "line":
                 self.fields[f"question_{question.id}"] = CharField(
-                    label=question.text, required=question.required
+                    label=question.text, required=question.required, initial=answer,
                 )
             elif question.type == "select":
                 ChoiceFieldClass = ChoiceField
@@ -42,6 +51,7 @@ class PageForm(Form):
                     ],
                     required=question.required,
                     widget=ChoiceWidgetClass,
+                    initial=answer,
                 )
 
     def _init_css_classes(self):

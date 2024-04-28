@@ -31,7 +31,7 @@ def page_dev(request):
 
 def page(request, page_id):
     page = get_object_or_404(Page, id=page_id)
-    form = PageForm(page, request.POST or None)
+    form = PageForm(page, request.POST or None, user=request.user)
 
     if request.method == "POST":
         if form.is_valid():
@@ -49,17 +49,17 @@ class PageView(LoginRequiredMixin, View):
     def get_page(self, page_id):
         return get_object_or_404(Page, id=page_id)
 
-    def get_form(self, page, data=None):
-        return PageForm(page, data)
+    def get_form(self, page, data=None, init_answers_from_user=None):
+        return PageForm(page, data, user=init_answers_from_user)
 
     def get(self, request, page_id):
         page = self.get_page(page_id)
-        form = self.get_form(page)
+        form = self.get_form(page, init_answers_from_user=request.user)
         return render(request, "answers/page.html", {"page": page, "form": form})
 
     def post(self, request, page_id):
         page = self.get_page(page_id)
-        form = self.get_form(page, request.POST)
+        form = self.get_form(page, request.POST, init_answers_from_user=request.user)
         if form.is_valid():
             form.save_answers(request.user)
             next_page_id = form.get_next_page_id()
