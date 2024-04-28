@@ -61,6 +61,10 @@ class PageForm(Form):
                 answers.append(Answer(user=user, question_id=question_id, answer=answer))
         Answer.objects.bulk_create(answers)
 
+    def get_next_page_id(self):
+        next_page = self.page.next_page
+        return next_page.id if next_page is not None else None
+
 
 class SignInForm(UserCreationForm):
     name = CharField(max_length=255)

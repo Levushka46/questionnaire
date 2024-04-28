@@ -62,9 +62,9 @@ class PageView(LoginRequiredMixin, View):
         form = self.get_form(page, request.POST)
         if form.is_valid():
             form.save_answers(request.user)
-            next_page = page.next_page
-            if next_page is not None:
-                return redirect("page", page_id=next_page.id)
+            next_page_id = form.get_next_page_id()
+            if next_page_id is not None:
+                return redirect("page", page_id=next_page_id)
             else:
                 return redirect("done")
         return render(request, "answers/page.html", {"page": page, "form": form})
