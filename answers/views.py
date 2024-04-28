@@ -1,11 +1,11 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django import forms
-from django.contrib.auth import login, logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.views.generic import TemplateView
 
-from answers.forms import PageForm, SignInForm
+from answers.forms import LoginForm, PageForm, SignInForm
 from answers.widgets import RadioSelect, CheckboxSelectMultiple
 from formpages.models import Page
 
@@ -75,6 +75,8 @@ class DoneView(TemplateView):
 
 
 class SignInView(View):
+    start_page = "page_dev"
+
     def get(self, request):
         logout(request)
         return render(request, "answers/sign_in.html")
@@ -84,5 +86,18 @@ class SignInView(View):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("page_dev")
+            return redirect(self.start_page)
+        else:
+            # If the email is correct, then try to log in user instead
+            # name is optional in this case
+            form = LoginForm(request.POST)
+            if form.is_valid():
+                email = form.cleaned_data["email"]
+                password = form.cleaned_data["password"]
+                user = authenticate(request, username=email, password=password)
+                if user is not None:
+                    login(request, user)
+                    return redirect(self.start_page)
+                else:
+                    form.add_error("password", "User exists, tried login: Invalid password.")
         return render(request, "answers/sign_in.html", {"form": form})

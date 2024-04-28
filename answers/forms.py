@@ -111,8 +111,7 @@ class PageForm(Form):
         return self.next_page_id
 
 
-class SignInForm(UserCreationForm):
-    name = CharField(max_length=255)
+class UserForm(UserCreationForm):
     email = EmailField(max_length=255)
     password = CharField()
 
@@ -122,6 +121,10 @@ class SignInForm(UserCreationForm):
     class Meta:
         model = get_user_model()
         fields = ("email",)
+
+
+class SignInForm(UserForm):
+    name = CharField(max_length=255)
 
     def _post_clean(self):
         super()._post_clean()
@@ -136,3 +139,7 @@ class SignInForm(UserCreationForm):
         return User.objects.create_user(
             email, email=email, password=password, first_name=self.cleaned_data["name"],
         )
+
+
+class LoginForm(UserForm):
+    pass
