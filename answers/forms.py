@@ -85,6 +85,9 @@ class PageForm(Form):
                         if dyn_next_page is not None and option.text in answer:
                             dynamic_next_pages.append(dyn_next_page)
 
+        # Delete all previous answers for this page
+        Answer.objects.filter(user=user, question__page=self.page).delete()
+
         Answer.objects.bulk_create(answers)
 
         # Add page.next_page to the stack
