@@ -77,8 +77,12 @@ WSGI_APPLICATION = "questionnaire.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "questionnaire_db",
+        "USER": "questionnaire",
+        "PASSWORD": "12345",
+        "HOST": "db",
+        "PORT": "5432",
     }
 }
 
@@ -123,3 +127,9 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+ADMINS = (
+    # ('Your Name', 'your_email@domain.com'),
+    ("admin", "admin@mysite.com"),
+)
+ADMIN_INITIAL_PASSWORD = "admin"  # To be changed after first login by admin
