@@ -17,6 +17,10 @@ class Answer(models.Model):
     )
     answer = models.CharField(_("answer"), max_length=255)
 
+    class Meta:
+        verbose_name=_("answer")
+        verbose_name_plural = _("answers")
+
 
 class PageStack(models.Model):
     user = models.OneToOneField(
@@ -26,3 +30,7 @@ class PageStack(models.Model):
         verbose_name=_("user"),
     )
     value = models.CharField(_("value"), max_length=255)
+
+    class Meta:
+        verbose_name=_("page stack")
+        verbose_name_plural = _("page stacks")

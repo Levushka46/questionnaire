@@ -4,6 +4,7 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 
 RUN apt-get update \
+  && apt-get install -y gettext \
   # dependencies for building Python packages
   && apt-get install -y build-essential \
   # for PostgreSQL

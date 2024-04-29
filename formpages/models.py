@@ -17,6 +17,10 @@ class Page(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        verbose_name=_("page")
+        verbose_name_plural = _("pages")
+
 
 class Question(models.Model):
 
@@ -45,6 +49,10 @@ class Question(models.Model):
     def __str__(self):
         return self.text
 
+    class Meta:
+        verbose_name=_("question")
+        verbose_name_plural = _("questions")
+
 
 class SelectOption(models.Model):
     question = models.ForeignKey(
@@ -68,6 +76,10 @@ class SelectOption(models.Model):
     def __str__(self):
         return self.text
 
+    class Meta:
+        verbose_name=_("select option")
+        verbose_name_plural = _("select options")
+
 
 class Survey(models.Model):
     title = models.CharField(_("title"), max_length=255)
@@ -84,3 +96,7 @@ class Survey(models.Model):
 
     def __str__(self):
         return self.title
+    
+    class Meta:
+        verbose_name=_("survey")
+        verbose_name_plural = _("surveys")
